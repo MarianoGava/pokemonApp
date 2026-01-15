@@ -1,12 +1,10 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { authStorage } from './lib/auth'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import HomePage from './pages/HomePage'
 import PokemonDetailPage from './pages/PokemonDetailPage'
 
-// Create a query client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

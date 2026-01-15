@@ -43,7 +43,6 @@ export interface PokemonListItem {
   name: string;
   number: number;
   image_url: string;
-  url: string;
 }
 
 export interface PokemonsResponse {
@@ -103,8 +102,26 @@ export const authApi = {
 };
 
 export const pokemonApi = {
-  getPokemons: async (offset: number = 0, limit: number = 20): Promise<PokemonsResponse> => {
-    return fetchApi<PokemonsResponse>(`/pokemons?offset=${offset}&limit=${limit}`);
+  getPokemons: async (
+    offset: number = 0,
+    limit: number = 20,
+    search?: string,
+    sortBy?: string
+  ): Promise<PokemonsResponse> => {
+    const params = new URLSearchParams({
+      offset: offset.toString(),
+      limit: limit.toString(),
+    });
+    
+    if (search && search.trim()) {
+      params.append('search', search.trim());
+    }
+    
+    if (sortBy && sortBy !== 'default') {
+      params.append('sort_by', sortBy);
+    }
+    
+    return fetchApi<PokemonsResponse>(`/pokemons?${params.toString()}`);
   },
   
   getPokemon: async (id: number | string): Promise<PokemonDetail> => {

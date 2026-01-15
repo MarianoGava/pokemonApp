@@ -1,7 +1,6 @@
 const AUTH_KEY = 'pokemon_app_auth';
 
 export interface AuthState {
-  isAuthenticated: boolean;
   username: string | null;
 }
 
@@ -12,17 +11,14 @@ export const authStorage = {
       try {
         return JSON.parse(stored);
       } catch {
-        return { isAuthenticated: false, username: null };
+        return { username: null };
       }
     }
-    return { isAuthenticated: false, username: null };
+    return { username: null };
   },
   
   set: (username: string): void => {
-    localStorage.setItem(AUTH_KEY, JSON.stringify({
-      isAuthenticated: true,
-      username,
-    }));
+    localStorage.setItem(AUTH_KEY, JSON.stringify({ username }));
   },
   
   clear: (): void => {

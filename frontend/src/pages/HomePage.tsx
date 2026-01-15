@@ -1,20 +1,28 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { usePokemons, useLogout } from '@/lib/queries';
-import { PokemonListItem } from '@/lib/api';
 import { authStorage } from '@/lib/auth';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { useDebounce } from '@/hooks/useDebounce';
 
 type SortOption = 'name' | 'number' | 'default';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const searchQuery = useDebounce(searchInput, 500);
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [offset, setOffset] = useState(0);
   const limit = 20;
 
-  const { data, isLoading, error: queryError } = usePokemons(offset, limit);
+  useEffect(() => {
+    setOffset(0);
+  }, [searchQuery, sortBy]);
+
+  const sortByParam = sortBy === 'default' ? undefined : (sortBy === 'number' ? 'id' : sortBy);
+  const searchParam = searchQuery.trim() || undefined;
+
+  const { data, isLoading, error: queryError } = usePokemons(offset, limit, searchParam, sortByParam);
   const logoutMutation = useLogout();
 
   const pokemons = data?.results || [];
@@ -32,30 +40,6 @@ export default function HomePage() {
     authStorage.clear();
     navigate('/login');
   };
-
-  const filteredAndSortedPokemons = useMemo(() => {
-    let filtered = pokemons;
-
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = pokemons.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query) ||
-          p.number.toString().includes(query)
-      );
-    }
-
-    // Sort
-    const sorted = [...filtered];
-    if (sortBy === 'name') {
-      sorted.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortBy === 'number') {
-      sorted.sort((a, b) => a.number - b.number);
-    }
-
-    return sorted;
-  }, [pokemons, searchQuery, sortBy]);
 
   return (
     <ProtectedRoute>
@@ -76,13 +60,12 @@ export default function HomePage() {
         </header>
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Search and Sort Controls */}
           <div className="mb-6 space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-4">
             <div className="flex-1">
               <input
                 type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="Search by name or number..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
               />
@@ -104,14 +87,12 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
 
-          {/* Loading State */}
           {isLoading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -119,17 +100,18 @@ export default function HomePage() {
             </div>
           ) : (
             <>
-              {/* Results Count */}
               <div className="mb-4 text-sm text-gray-600">
                 {searchQuery
-                  ? `Found ${filteredAndSortedPokemons.length} pokemon(s)`
+                  ? `Found ${pokemons.length} pokemon(s)${totalCount > pokemons.length ? ` (showing page results)` : ''}`
                   : `Showing ${offset + 1}-${Math.min(offset + limit, totalCount)} of ${totalCount} pokemons`}
+                {searchInput !== searchQuery && searchInput && (
+                  <span className="ml-2 text-gray-400 italic">(typing...)</span>
+                )}
               </div>
 
-              {/* Pokemon Grid */}
-              {filteredAndSortedPokemons.length > 0 ? (
+              {pokemons.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {filteredAndSortedPokemons.map((pokemon) => (
+                  {pokemons.map((pokemon) => (
                     <Link
                       key={pokemon.id}
                       to={`/pokemon/${pokemon.id}`}
@@ -158,8 +140,7 @@ export default function HomePage() {
                 </div>
               )}
 
-              {/* Pagination */}
-              {!searchQuery && (
+              {(hasNext || hasPrevious) && (
                 <div className="mt-8 flex justify-center items-center space-x-4">
                   <button
                     onClick={() => setOffset((prev) => Math.max(0, prev - limit))}
@@ -169,7 +150,7 @@ export default function HomePage() {
                     Previous
                   </button>
                   <span className="text-sm text-gray-600">
-                    Page {Math.floor(offset / limit) + 1} of {Math.ceil(totalCount / limit)}
+                    Page {Math.floor(offset / limit) + 1}{totalCount > 0 ? ` of ${Math.ceil(totalCount / limit)}` : ''}
                   </span>
                   <button
                     onClick={() => setOffset((prev) => prev + limit)}

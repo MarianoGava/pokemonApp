@@ -12,22 +12,19 @@ export default function ProtectedRoute({
   requireAuth = true 
 }: ProtectedRouteProps) {
   const navigate = useNavigate();
-  const auth = authStorage.get();
+  const { username } = authStorage.get();
+  const isAuthenticated = !!username;
 
   useEffect(() => {
-    if (requireAuth && !auth.isAuthenticated) {
+    if (requireAuth && !isAuthenticated) {
       navigate('/login');
-    } else if (!requireAuth && auth.isAuthenticated) {
+    } else if (!requireAuth && isAuthenticated) {
       navigate('/');
     }
-  }, [auth.isAuthenticated, requireAuth, navigate]);
+  }, [isAuthenticated, requireAuth, navigate]);
 
-  if (requireAuth && !auth.isAuthenticated) {
-    return null; // or a loading spinner
-  }
-
-  if (!requireAuth && auth.isAuthenticated) {
-    return null; // or a loading spinner
+  if ((requireAuth && !isAuthenticated) || (!requireAuth && isAuthenticated)) {
+    return null;
   }
 
   return <>{children}</>;

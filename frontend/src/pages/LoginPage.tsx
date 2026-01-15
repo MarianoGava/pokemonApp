@@ -42,11 +42,9 @@ export default function LoginPage() {
       if (response.success) {
         authStorage.set(username);
         navigate('/');
-      } else {
-        // Error will be handled by mutation error
       }
     } catch (err) {
-      // Error is handled by mutation
+      // Error handled by mutation
     }
   };
 
@@ -111,7 +109,7 @@ export default function LoginPage() {
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                {error || 'Login failed. Please try again.'}
+                {error}
               </div>
             )}
 
