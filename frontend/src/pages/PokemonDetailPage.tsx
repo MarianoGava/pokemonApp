@@ -7,42 +7,53 @@ export default function PokemonDetailPage() {
   const { data: pokemon, isLoading, error } = usePokemon(id!);
 
   const getTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-      normal: 'bg-gray-400',
-      fire: 'bg-red-500',
-      water: 'bg-blue-500',
-      electric: 'bg-yellow-400',
-      grass: 'bg-green-500',
-      ice: 'bg-blue-300',
-      fighting: 'bg-red-700',
-      poison: 'bg-purple-500',
-      ground: 'bg-yellow-600',
-      flying: 'bg-indigo-400',
-      psychic: 'bg-pink-500',
-      bug: 'bg-green-400',
-      rock: 'bg-yellow-700',
-      ghost: 'bg-purple-700',
-      dragon: 'bg-indigo-700',
-      dark: 'bg-gray-800',
-      steel: 'bg-gray-500',
-      fairy: 'bg-pink-300',
+    const typeLower = type.toLowerCase();
+    const colorMap: Record<string, string> = {
+      normal: 'bg-type-normal',
+      fire: 'bg-type-fire',
+      water: 'bg-type-water',
+      electric: 'bg-type-electric',
+      grass: 'bg-type-grass',
+      ice: 'bg-type-ice',
+      fighting: 'bg-type-fighting',
+      poison: 'bg-type-poison',
+      ground: 'bg-type-ground',
+      flying: 'bg-type-flying',
+      psychic: 'bg-type-psychic',
+      bug: 'bg-type-bug',
+      rock: 'bg-type-rock',
+      ghost: 'bg-type-ghost',
+      dragon: 'bg-type-dragon',
+      dark: 'bg-type-dark',
+      steel: 'bg-type-steel',
+      fairy: 'bg-type-fairy',
     };
-    return colors[type.toLowerCase()] || 'bg-gray-400';
+    return colorMap[typeLower] || 'bg-type-normal';
+  };
+
+  const getPrimaryTypeColor = () => {
+    if (!pokemon?.types?.length) return 'bg-primary';
+    return getTypeColor(pokemon.types[0]);
   };
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        <header className="bg-white shadow-sm">
+      <div className="min-h-screen bg-gray-background">
+        <header className={`${pokemon ? getPrimaryTypeColor() : 'bg-primary'} text-gray-white shadow-drop`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center">
               <Link
                 to="/"
-                className="text-primary-600 hover:text-primary-700 font-medium mr-4"
+                className="text-gray-white hover:text-gray-light font-bold mr-4 text-body1"
               >
-                ← Back to List
+                ← Back
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900">Pokemon Details</h1>
+              {pokemon && (
+                <div className="flex-1">
+                  <h1 className="text-h1 text-gray-white capitalize">{pokemon.name}</h1>
+                  <p className="text-subtitle1 text-gray-white">#{String(pokemon.number).padStart(3, '0')}</p>
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -50,17 +61,16 @@ export default function PokemonDetailPage() {
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {isLoading ? (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-              <p className="mt-4 text-gray-600">Loading pokemon details...</p>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <p className="mt-4 text-body1 text-gray-medium">Loading pokemon details...</p>
             </div>
           ) : error ? (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-body2">
               {error.message || 'Failed to load pokemon details'}
             </div>
           ) : pokemon ? (
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              {/* Header Section */}
-              <div className="bg-gradient-to-r from-primary-500 to-primary-700 px-6 py-8">
+            <div className="bg-gray-white rounded-lg shadow-drop overflow-hidden">
+              <div className={`${getPrimaryTypeColor()} px-6 py-8`}>
                 <div className="flex flex-col md:flex-row items-center md:items-start">
                   <div className="w-48 h-48 mb-4 md:mb-0 md:mr-8 flex items-center justify-center">
                     <img
@@ -70,15 +80,11 @@ export default function PokemonDetailPage() {
                     />
                   </div>
                   <div className="flex-1 text-center md:text-left">
-                    <h2 className="text-4xl font-bold text-white capitalize mb-2">
-                      {pokemon.name}
-                    </h2>
-                    <p className="text-primary-100 text-lg mb-4">#{pokemon.number}</p>
                     <div className="flex flex-wrap gap-2 justify-center md:justify-start">
                       {pokemon.types.map((type) => (
                         <span
                           key={type}
-                          className={`${getTypeColor(type)} text-white px-4 py-1 rounded-full text-sm font-semibold capitalize`}
+                          className={`${getTypeColor(type)} text-gray-white px-4 py-2 rounded-full text-body2 font-bold capitalize`}
                         >
                           {type}
                         </span>
@@ -88,48 +94,45 @@ export default function PokemonDetailPage() {
                 </div>
               </div>
 
-              {/* Details Section */}
               <div className="p-6 space-y-6">
-                {/* Basic Stats */}
                 <section>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Basic Information</h3>
+                  <h3 className="text-subtitle1 text-gray-dark mb-4">About</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Height</p>
-                      <p className="text-lg font-semibold">{pokemon.height / 10}m</p>
+                    <div className="bg-gray-background p-4 rounded-lg">
+                      <p className="text-body2 text-gray-medium mb-1">Height</p>
+                      <p className="text-body1 font-bold text-gray-dark">{(pokemon.height / 10).toFixed(1)}m</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Weight</p>
-                      <p className="text-lg font-semibold">{pokemon.weight / 10}kg</p>
+                    <div className="bg-gray-background p-4 rounded-lg">
+                      <p className="text-body2 text-gray-medium mb-1">Weight</p>
+                      <p className="text-body1 font-bold text-gray-dark">{(pokemon.weight / 10).toFixed(1)}kg</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Base Experience</p>
-                      <p className="text-lg font-semibold">{pokemon.base_experience}</p>
+                    <div className="bg-gray-background p-4 rounded-lg">
+                      <p className="text-body2 text-gray-medium mb-1">Base Experience</p>
+                      <p className="text-body1 font-bold text-gray-dark">{pokemon.base_experience}</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600 mb-1">Total Stats</p>
-                      <p className="text-lg font-semibold">
+                    <div className="bg-gray-background p-4 rounded-lg">
+                      <p className="text-body2 text-gray-medium mb-1">Total Stats</p>
+                      <p className="text-body1 font-bold text-gray-dark">
                         {pokemon.stats.reduce((sum, stat) => sum + stat.base_stat, 0)}
                       </p>
                     </div>
                   </div>
                 </section>
 
-                {/* Base Stats */}
                 <section>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Base Stats</h3>
+                  <h3 className="text-subtitle1 text-gray-dark mb-4">Base Stats</h3>
                   <div className="space-y-3">
                     {pokemon.stats.map((stat) => (
                       <div key={stat.name}>
                         <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium text-gray-700 capitalize">
+                          <span className="text-body2 text-gray-dark capitalize">
                             {stat.name.replace('-', ' ')}
                           </span>
-                          <span className="text-sm font-semibold">{stat.base_stat}</span>
+                          <span className="text-body2 font-bold text-gray-dark">{stat.base_stat}</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-light rounded-full h-2">
                           <div
-                            className="bg-primary-600 h-2 rounded-full"
+                            className={`${getPrimaryTypeColor()} h-2 rounded-full`}
                             style={{ width: `${(stat.base_stat / 255) * 100}%` }}
                           ></div>
                         </div>
@@ -138,70 +141,25 @@ export default function PokemonDetailPage() {
                   </div>
                 </section>
 
-                {/* Abilities */}
-                <section>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Abilities</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {pokemon.abilities.map((ability, index) => (
-                      <div
-                        key={index}
-                        className="bg-gray-50 p-4 rounded-lg border border-gray-200"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-semibold text-gray-900 capitalize">
-                            {ability.name.replace('-', ' ')}
-                          </span>
-                          {ability.is_hidden && (
-                            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                              Hidden
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">Slot: {ability.slot}</p>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                {/* Moves */}
-                <section>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">
-                    Moves ({pokemon.moves.length})
-                  </h3>
-                  <div className="max-h-96 overflow-y-auto">
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                      {pokemon.moves.map((move, index) => (
-                        <div
-                          key={index}
-                          className="bg-gray-50 p-3 rounded-lg border border-gray-200 text-sm"
-                        >
-                          <p className="font-medium text-gray-900 capitalize">
-                            {move.name.replace('-', ' ')}
-                          </p>
-                          {move.version_group_details.length > 0 && (
-                            <p className="text-xs text-gray-600 mt-1">
-                              Level {move.version_group_details[0].level_learned_at}
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </section>
-
-                {/* Forms */}
-                {pokemon.forms.length > 1 && (
+                {pokemon.abilities.length > 0 && (
                   <section>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Forms</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                      {pokemon.forms.map((form, index) => (
+                    <h3 className="text-subtitle1 text-gray-dark mb-4">Abilities</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {pokemon.abilities.map((ability, index) => (
                         <div
                           key={index}
-                          className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                          className="bg-gray-background p-4 rounded-lg border border-gray-light"
                         >
-                          <p className="font-semibold text-gray-900 capitalize">
-                            {form.name.replace('-', ' ')}
-                          </p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-body1 font-bold text-gray-dark capitalize">
+                              {ability.name.replace('-', ' ')}
+                            </span>
+                            {ability.is_hidden && (
+                              <span className="text-caption bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                                Hidden
+                              </span>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>

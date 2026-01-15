@@ -60,7 +60,7 @@ src/
 │   └── auth.ts               # Authentication utilities
 ├── pages/
 │   ├── LoginPage.tsx         # Login page
-│   ├── HomePage.tsx          # Main Pokemon list page
+│   ├── ListPage.tsx          # Main Pokemon list page
 │   └── PokemonDetailPage.tsx # Pokemon detail page
 ├── App.tsx                   # Main app component with routes
 ├── main.tsx                  # Entry point

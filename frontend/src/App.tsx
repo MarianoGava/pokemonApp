@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
-import HomePage from './pages/HomePage'
+import PokemonList from './pages/PokemonList'
 import PokemonDetailPage from './pages/PokemonDetailPage'
 
 const queryClient = new QueryClient({
@@ -30,7 +30,7 @@ function App() {
           path="/"
           element={
             <ProtectedRoute requireAuth={true}>
-              <HomePage />
+              <PokemonList />
             </ProtectedRoute>
           }
         />

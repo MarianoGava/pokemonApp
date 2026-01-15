@@ -53,16 +53,16 @@ export default function LoginPage() {
 
   return (
     <ProtectedRoute requireAuth={false}>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
+      <div className="min-h-screen flex items-center justify-center bg-primary px-4">
+        <div className="max-w-md w-full bg-gray-white rounded-lg shadow-drop p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Pokemon App</h1>
-            <p className="text-gray-600">Sign in to continue</p>
+            <h1 className="text-h1 text-gray-dark mb-2">Pokédex</h1>
+            <p className="text-body1 text-gray-medium">Sign in to continue</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="username" className="block text-subtitle2 text-gray-dark mb-2">
                 Username
               </label>
               <input
@@ -73,19 +73,19 @@ export default function LoginPage() {
                   setUsername(e.target.value);
                   setValidationErrors((prev) => ({ ...prev, username: undefined }));
                 }}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                  validationErrors.username ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-body1 ${
+                  validationErrors.username ? 'border-red-500' : 'border-gray-light'
                 }`}
                 placeholder="Enter username"
                 disabled={loginMutation.isPending}
               />
               {validationErrors.username && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.username}</p>
+                <p className="mt-1 text-body2 text-red-600">{validationErrors.username}</p>
               )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-subtitle2 text-gray-dark mb-2">
                 Password
               </label>
               <input
@@ -96,19 +96,19 @@ export default function LoginPage() {
                   setPassword(e.target.value);
                   setValidationErrors((prev) => ({ ...prev, password: undefined }));
                 }}
-                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                  validationErrors.password ? 'border-red-500' : 'border-gray-300'
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-body1 ${
+                  validationErrors.password ? 'border-red-500' : 'border-gray-light'
                 }`}
                 placeholder="Enter password"
                 disabled={loginMutation.isPending}
               />
               {validationErrors.password && (
-                <p className="mt-1 text-sm text-red-600">{validationErrors.password}</p>
+                <p className="mt-1 text-body2 text-red-600">{validationErrors.password}</p>
               )}
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-body2">
                 {error}
               </div>
             )}
@@ -116,7 +116,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full bg-primary text-gray-white py-3 rounded-lg font-bold text-body1 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity shadow-drop"
             >
               {loginMutation.isPending ? 'Signing in...' : 'Sign In'}
             </button>

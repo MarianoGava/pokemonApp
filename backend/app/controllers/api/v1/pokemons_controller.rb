@@ -4,10 +4,12 @@ module Api
       before_action :authenticate_user
 
       def index
-        offset = params[:offset]&.to_i || 0
-        limit = params[:limit]&.to_i || 20
-        
-        result = PokeapiService.get_pokemons(offset: offset, limit: limit)
+        result = PokeapiService.get_pokemons(
+          offset: params[:offset]&.to_i || 0,
+          limit: params[:limit]&.to_i || 20,
+          search: params[:search]&.strip,
+          sort_by: params[:sort_by]&.strip
+        )
         
         if result[:error]
           render json: { error: result[:error] }, status: :bad_gateway

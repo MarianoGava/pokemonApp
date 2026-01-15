@@ -1,6 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1';
+import { authStorage } from './auth';
 
-// Fetch helper with credentials support
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -9,7 +10,7 @@ async function fetchApi<T>(
   
   const response = await fetch(url, {
     ...options,
-    credentials: 'include', // Important for session cookies
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,
@@ -17,6 +18,13 @@ async function fetchApi<T>(
   });
 
   if (!response.ok) {
+    if (response.status === 401 && !endpoint.includes('/login')) {
+      authStorage.clear();
+      window.location.href = '/login';
+      const error = await response.json().catch(() => ({ error: 'Unauthorized' }));
+      throw new Error(error.error || 'Session expired');
+    }
+    
     const error = await response.json().catch(() => ({ error: 'Request failed' }));
     throw new Error(error.error || `HTTP error! status: ${response.status}`);
   }

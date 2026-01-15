@@ -117,7 +117,7 @@ pokemonApp/
 │   ├── src/
 │   │   ├── pages/
 │   │   │   ├── LoginPage.tsx               # Login page
-│   │   │   ├── HomePage.tsx                # Main Pokemon list page
+│   │   │   ├── ListPage.tsx                # Main Pokemon list page
 │   │   │   └── PokemonDetailPage.tsx      # Pokemon detail page
 │   │   ├── components/
 │   │   │   └── ProtectedRoute.tsx          # Route protection
