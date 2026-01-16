@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { usePokemon } from '@/lib/queries';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import BaseStats from '@/components/BaseStats';
+import AboutSection from '@/components/AboutSection';
 import { typeColors } from '@/constants/typeColors';
 import backArrow from '@/assets/icons/back-arrow.svg';
 import pokeballIcon from '@/assets/icons/pokeball.svg';
@@ -10,10 +11,9 @@ interface HeaderProps {
   pokemonName?: string;
   pokemonNumber?: number;
   primaryColorClass: string;
-  primaryColorHex: string;
 }
 
-function Header({ pokemonName, pokemonNumber, primaryColorClass, primaryColorHex }: HeaderProps) {
+function Header({ pokemonName, pokemonNumber, primaryColorClass }: HeaderProps) {
   return (
     <header className={`${primaryColorClass} text-gray-white shadow-drop relative overflow-hidden h-[220px] flex-shrink-0`}>
         <img 
@@ -93,10 +93,9 @@ export default function PokemonDetailPage() {
           pokemonName={pokemon?.name}
           pokemonNumber={pokemon?.number}
           primaryColorClass={primaryColorClass}
-          primaryColorHex={primaryColorHex}
         />
 
-        <div className="relative mx-1 mb-1">
+        <div className="relative mx-1 mb-1 flex-1 flex flex-col min-h-0">
             {isLoading ? (
               <div className="text-center py-12">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: primaryColorHex }}></div>
@@ -115,74 +114,28 @@ export default function PokemonDetailPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-              
-              <div className="bg-gray-white rounded-lg shadow-drop overflow-hidden">
-
-                    <div className="flex-1 text-center md:text-left">
-                      <div className="flex flex-wrap mt-24 gap-2 justify-center md:justify-start">
+              <div className="bg-gray-white rounded-lg shadow-drop flex flex-col min-h-0">
+                    <div className="text-center md:text-left flex-shrink-0">
+                      <div className="flex flex-wrap mt-20 gap-2 justify-center md:justify-start">
                         {pokemon.types.map((type) => (
                           <span
                             key={type}
+                            style={{ backgroundColor: getTypeColorHex(type) }}
                             className={`${getTypeColorClass(type)} text-gray-white px-4 py-2 rounded-full text-body2 font-bold capitalize`}
                           >
                             {type}
                           </span>
                         ))}
                       </div>
-                </div>
-
-                <div className="p-6 space-y-6">
-                  <section>
-                    <h3 className="text-subtitle1 text-gray-dark mb-4">About</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="bg-gray-background p-4 rounded-lg">
-                        <p className="text-body2 text-gray-medium mb-1">Height</p>
-                        <p className="text-body1 font-bold text-gray-dark">{(pokemon.height / 10).toFixed(1)}m</p>
-                      </div>
-                      <div className="bg-gray-background p-4 rounded-lg">
-                        <p className="text-body2 text-gray-medium mb-1">Weight</p>
-                        <p className="text-body1 font-bold text-gray-dark">{(pokemon.weight / 10).toFixed(1)}kg</p>
-                      </div>
-                      <div className="bg-gray-background p-4 rounded-lg">
-                        <p className="text-body2 text-gray-medium mb-1">Base Experience</p>
-                        <p className="text-body1 font-bold text-gray-dark">{pokemon.base_experience}</p>
-                      </div>
-                      <div className="bg-gray-background p-4 rounded-lg">
-                        <p className="text-body2 text-gray-medium mb-1">Total Stats</p>
-                        <p className="text-body1 font-bold text-gray-dark">
-                          {pokemon.stats.reduce((sum, stat) => sum + stat.base_stat, 0)}
-                        </p>
-                      </div>
                     </div>
-                  </section>
 
-                  <BaseStats stats={pokemon.stats} primaryColorHex={primaryColorHex} />
-
-                  {pokemon.abilities.length > 0 && (
-                    <section>
-                      <h3 className="text-subtitle1 text-gray-dark mb-4">Abilities</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {pokemon.abilities.map((ability, index) => (
-                          <div
-                            key={index}
-                            className="bg-gray-background p-4 rounded-lg border border-gray-light"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="text-body1 font-bold text-gray-dark capitalize">
-                                {ability.name.replace('-', ' ')}
-                              </span>
-                              {ability.is_hidden && (
-                                <span className="text-caption bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                                  Hidden
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </section>
-                  )}
-                </div>
+                    <div className="p-6 overflow-y-auto flex-1">
+                      <AboutSection
+                        pokemon={pokemon}
+                        primaryColorHex={primaryColorHex}
+                      />
+                      <BaseStats stats={pokemon.stats} primaryColorHex={primaryColorHex} />
+                    </div>
               </div>
               </>
             ) : null}
