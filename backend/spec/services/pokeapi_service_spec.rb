@@ -283,7 +283,6 @@ RSpec.describe PokeapiService do
           .to_return(status: 200, body: 'invalid json', headers: { 'Content-Type' => 'application/json' })
 
         result = described_class.get_pokemon(pokemon_id)
-
         expect(result).to have_key(:error)
       end
     end

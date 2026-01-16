@@ -303,13 +303,8 @@ The application includes several performance optimizations:
 
 ## 🚧 Future Enhancements
 
-- [ ] Add unit and integration tests
-- [ ] Implement caching for Pokemon data
+- [ ] Add integration tests
+- [ ] Implement caching for Pokemon data besides react query cache
 - [ ] Add favorite Pokemon feature
-- [ ] Implement advanced filtering options
-- [ ] Add Pokemon comparison feature
-- [ ] Implement offline support with service workers
 
-## 📄 License
 
-This project is created for a technical interview exercise.

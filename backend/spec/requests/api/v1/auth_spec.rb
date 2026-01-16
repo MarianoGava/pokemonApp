@@ -13,7 +13,6 @@ RSpec.describe 'Api::V1::Auth', type: :request do
         expect(json_response['user']['username']).to eq('admin')
         expect(session[:user_id]).to eq('admin')
       end
-
     end
 
     context 'with invalid credentials' do
