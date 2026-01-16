@@ -112,7 +112,7 @@ class PokeapiService
       id: data['id'],
       name: data['name'],
       number: data['id'],
-      image_url: data.dig('sprites', 'front_default') || data.dig('sprites', 'other', 'official-artwork', 'front_default') || "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/#{data['id']}.png",
+      image_url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/#{data['id']}.png",
       height: data['height'],
       weight: data['weight'],
       base_experience: data['base_experience'],
