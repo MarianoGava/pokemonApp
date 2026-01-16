@@ -43,8 +43,8 @@ export default function LoginPage() {
         authStorage.set(username);
         navigate('/');
       }
-    } catch (err) {
-      // Error handled by mutation
+    } catch {
+      // Error is handled and displayed by the mutation
     }
   };
 

@@ -1,4 +1,4 @@
-const AUTH_KEY = 'pokemon_app_auth';
+import { STORAGE_KEYS } from '@/constants/config';
 
 export interface AuthState {
   username: string | null;
@@ -6,7 +6,7 @@ export interface AuthState {
 
 export const authStorage = {
   get: (): AuthState => {
-    const stored = localStorage.getItem(AUTH_KEY);
+    const stored = localStorage.getItem(STORAGE_KEYS.AUTH);
     if (stored) {
       try {
         return JSON.parse(stored);
@@ -18,11 +18,11 @@ export const authStorage = {
   },
   
   set: (username: string): void => {
-    localStorage.setItem(AUTH_KEY, JSON.stringify({ username }));
+    localStorage.setItem(STORAGE_KEYS.AUTH, JSON.stringify({ username }));
   },
   
   clear: (): void => {
-    localStorage.removeItem(AUTH_KEY);
+    localStorage.removeItem(STORAGE_KEYS.AUTH);
   },
 };
 

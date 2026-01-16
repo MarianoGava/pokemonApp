@@ -22,7 +22,7 @@ export default function SortModal({
   };
 
   return createPortal(
-    <>
+    <div>
       <div
         className="fixed inset-0 bg-black/40 z-40"
         onClick={onClose}
@@ -66,7 +66,7 @@ export default function SortModal({
           </button>
         </div>
       </div>
-    </>,
+    </div>,
     document.body
   );
 }

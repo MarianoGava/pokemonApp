@@ -40,7 +40,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: (credentials: LoginCredentials) => authApi.login(credentials),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pokemons'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.pokemons(0, 20) });
     },
   });
 }

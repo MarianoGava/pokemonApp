@@ -7,41 +7,50 @@ A full-stack Pokemon application built with **React SPA (TypeScript + React Rout
 This application allows users to:
 - **Login** with credentials (admin/admin)
 - **Browse** a paginated list of Pokemon from PokeAPI
-- **Search** Pokemon by name or number
-- **Sort** Pokemon by name or number
-- **View detailed information** about each Pokemon including abilities, moves, and forms
+- **Search** Pokemon by name or ID (server-side filtering)
+- **Sort** Pokemon by name or number (server-side sorting)
+- **View detailed information** about each Pokemon including stats, abilities, and types
 
 ## 🏗️ Architecture
 
 ### Backend (Ruby on Rails)
 - **API-only** Rails application
-- Proxies requests to [PokeAPI](https://pokeapi.co/)
-- Session-based authentication
+- Uses **GraphQL** for Pokemon list (filtering, sorting, pagination)
+- Uses **REST API** for Pokemon details
+- Session-based authentication with 24-hour expiration
+- Parameter validation (offset, limit, search, sort_by)
 - No local database required (uses PokeAPI as source of truth)
 
 ### Frontend (React SPA + TypeScript)
 - **React 18.3** with React Router 6
 - **Vite** as build tool and dev server
 - **TypeScript** for type safety
-- **Tailwind CSS** for styling
+- **Tailwind CSS** for styling with custom design system
+- **TanStack React Query** for data fetching and caching
 - **Protected routes** with authentication
-- Responsive design (mobile-first)
+- **Debounced search** input (500ms delay)
+- **React.memo** for performance optimization
+- Responsive design (mobile-first, max-width: 780px)
 
 ## 📋 Requirements Implementation
 
 ### ✅ Backend Endpoints
 - `POST /api/v1/login` - Handle credentials authorization (admin/admin)
-- `GET /api/v1/pokemons` - Paginated list of Pokemon from PokeAPI
-- `GET /api/v1/pokemons/:id` - Detailed Pokemon information
+- `GET /api/v1/pokemons` - Paginated list with search and sorting (uses GraphQL)
+  - Query params: `offset`, `limit`, `search`, `sort_by`
+- `GET /api/v1/pokemons/:id` - Detailed Pokemon information (uses REST)
 
 ### ✅ Frontend Features
-- Login screen with validation
-- Protected routes (redirects if not authenticated)
-- Main page with search bar and Pokemon list
-- Pagination support
-- Sorting by name and number
-- Pokemon detail view with abilities, moves, and forms
-- Responsive design
+- Login screen with form validation
+- Protected routes with automatic redirect on 401
+- Main page with debounced search and sort modal
+- Server-side pagination, filtering, and sorting
+- Pokemon detail view with:
+  - Base stats with progress bars
+  - About section (height, weight, abilities)
+  - Dynamic color theming based on Pokemon type
+- Responsive design with max-width container (780px)
+- Loading states and error handling
 
 ## 🚀 Getting Started
 
@@ -81,10 +90,13 @@ cd frontend
 npm install
 ```
 
-3. Create a `.env` file (optional):
+3. Create a `.env` file:
 ```env
 VITE_API_URL=http://localhost:3001/api/v1
+VITE_AUTH_KEY=pokemon_app_auth
 ```
+
+**Note:** `VITE_AUTH_KEY` is optional (defaults to 'pokemon_app_auth'), but `VITE_API_URL` is required.
 
 4. Start the development server:
 ```bash
@@ -117,13 +129,26 @@ pokemonApp/
 │   ├── src/
 │   │   ├── pages/
 │   │   │   ├── LoginPage.tsx               # Login page
-│   │   │   ├── ListPage.tsx                # Main Pokemon list page
-│   │   │   └── PokemonDetailPage.tsx      # Pokemon detail page
+│   │   │   ├── PokemonList.tsx             # Main Pokemon list page
+│   │   │   └── PokemonDetailPage.tsx       # Pokemon detail page
 │   │   ├── components/
-│   │   │   └── ProtectedRoute.tsx          # Route protection
+│   │   │   ├── AboutSection.tsx            # About section component
+│   │   │   ├── BaseStats.tsx               # Base stats component
+│   │   │   ├── ListHeader.tsx              # List page header
+│   │   │   ├── PokemonCard.tsx             # Pokemon card component
+│   │   │   ├── ProtectedRoute.tsx          # Route protection
+│   │   │   └── SortModal.tsx               # Sort options modal
+│   │   ├── constants/
+│   │   │   ├── config.ts                   # App configuration constants
+│   │   │   └── typeColors.ts               # Pokemon type colors
+│   │   ├── hooks/
+│   │   │   └── useDebounce.ts              # Debounce hook
 │   │   ├── lib/
 │   │   │   ├── api.ts                      # API client
-│   │   │   └── auth.ts                     # Auth utilities
+│   │   │   ├── auth.ts                     # Auth utilities
+│   │   │   └── queries.ts                  # React Query hooks
+│   │   ├── utils/
+│   │   │   └── typeColors.ts               # Type color utilities
 │   │   ├── App.tsx                         # Main app with routes
 │   │   ├── main.tsx                        # Entry point
 │   │   └── index.css                       # Global styles
@@ -148,12 +173,15 @@ npm test
 
 ## 🎨 Design Notes
 
-The application follows a mobile-first responsive design approach. While the original requirements mention a Figma design for mobile screens, this implementation provides:
-- Clean, modern UI with Tailwind CSS
-- Responsive grid layouts
-- Smooth transitions and hover effects
-- Accessible form inputs and buttons
-- Loading states and error handling
+The application follows a mobile-first responsive design approach with a maximum content width of 780px on desktop:
+- **Custom design system** with defined colors, typography, and shadows
+- **Dynamic color theming** based on Pokemon type
+- **Responsive grid layouts** (3 columns on mobile)
+- **Fixed headers** with scrollable content areas
+- **Smooth transitions** and hover effects
+- **Accessible form inputs** and buttons with proper ARIA labels
+- **Loading states** and comprehensive error handling
+- **Optimized images** using PokeAPI's high-quality sprites
 
 ## 🔧 Technologies Used
 
@@ -200,11 +228,13 @@ Login with credentials.
 ### Pokemon Endpoints
 
 #### GET /api/v1/pokemons
-Get paginated list of Pokemon.
+Get paginated list of Pokemon with optional filtering and sorting.
 
 **Query Parameters:**
-- `offset` (optional): Starting index (default: 0)
-- `limit` (optional): Number of results (default: 20)
+- `offset` (optional): Starting index, min: 0 (default: 0)
+- `limit` (optional): Number of results, range: 1-100 (default: 20)
+- `search` (optional): Search by name or ID (filters server-side)
+- `sort_by` (optional): Sort by `name` or `id` (default: `id`)
 
 **Response:**
 ```json
@@ -233,103 +263,41 @@ Get detailed Pokemon information.
   "id": 1,
   "name": "bulbasaur",
   "number": 1,
-  "image_url": "https://...",
+  "image_url": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png",
   "height": 7,
   "weight": 69,
-  "base_experience": 64,
   "types": ["grass", "poison"],
-  "abilities": [...],
-  "moves": [...],
-  "forms": [...],
-  "stats": [...]
+  "abilities": [
+    { "name": "overgrow" }
+  ],
+  "stats": [
+    { "name": "hp", "base_stat": 45 },
+    { "name": "attack", "base_stat": 49 }
+  ]
 }
 ```
+
+**Note:** The response only includes fields used by the frontend. `moves` and `forms` are not included for performance.
 
 ---
 
-## 🤖 Generative AI Tools Usage
+## 🚀 Performance Optimizations
 
-### Task: Table Component for Task Management System
+The application includes several performance optimizations:
 
-As part of the requirements, here's how I would approach generating a Table component using GenAI tools:
+### Frontend
+- **React.memo** on reusable components (PokemonCard, AboutSection, BaseStats)
+- **Debounced search** (500ms) to reduce API calls
+- **React Query** caching with configurable stale/gc times
+- **Lazy loading** images with `loading="lazy"`
+- **Optimized payloads** - only fetches necessary data from backend
+- **Centralized constants** for maintainability
 
-#### Prompt Used:
-```
-I need to create a React Table component for a task management system with CRUD operations. 
-The component should:
-- Display tasks in a table format with columns: title, description, status, due_date, and actions
-- Support creating, reading, updating, and deleting tasks
-- Each task is associated with a user (assume User model exists)
-- Use TypeScript for type safety
-- Include proper error handling and loading states
-- Make it accessible and responsive
-- Use modern React patterns (hooks, functional components)
-```
-
-#### Generated Code Sample:
-```typescript
-// Example of what would be generated
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: 'pending' | 'in_progress' | 'completed';
-  due_date: string;
-  user_id: number;
-}
-
-interface TaskTableProps {
-  tasks: Task[];
-  onEdit: (task: Task) => void;
-  onDelete: (id: number) => void;
-  onCreate: () => void;
-}
-
-export const TaskTable: React.FC<TaskTableProps> = ({
-  tasks,
-  onEdit,
-  onDelete,
-  onCreate,
-}) => {
-  // Component implementation
-};
-```
-
-#### Validation Process:
-
-1. **Code Review:**
-   - Checked TypeScript types for correctness
-   - Verified component follows React best practices
-   - Ensured proper prop types and interfaces
-
-2. **Improvements Made:**
-   - Added error boundaries
-   - Implemented proper loading states
-   - Added accessibility attributes (ARIA labels)
-   - Optimized re-renders with React.memo where appropriate
-   - Added form validation for create/edit operations
-
-3. **Edge Cases Handled:**
-   - Empty state when no tasks exist
-   - Network error handling
-   - Validation for required fields (title, due_date)
-   - Date formatting and validation
-   - User permission checks (if user can edit/delete)
-
-4. **Performance Assessment:**
-   - Used useMemo for expensive computations (filtering, sorting)
-   - Implemented virtual scrolling for large lists
-   - Debounced search/filter inputs
-   - Lazy loading for task details
-
-5. **Code Quality:**
-   - Followed ESLint rules
-   - Added JSDoc comments for complex functions
-   - Ensured consistent code style
-   - Added unit tests for critical functions
-
-#### Final Assessment:
-The AI-generated code provided a solid foundation but required refinement for production use. Key improvements included adding proper error handling, accessibility features, and performance optimizations. The code structure was clean and followed React best practices, making it easy to extend and maintain.
+### Backend
+- **GraphQL** for efficient list queries (only fetches needed fields)
+- **Parameter validation** prevents invalid requests
+- **Optimized data transformation** - excludes unused fields (moves, forms, base_experience)
+- **Error handling** with appropriate HTTP status codes
 
 ---
 

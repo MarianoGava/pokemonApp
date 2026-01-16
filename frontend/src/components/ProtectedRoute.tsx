@@ -16,17 +16,20 @@ export default function ProtectedRoute({
   const isAuthenticated = !!username;
 
   useEffect(() => {
-    if (requireAuth && !isAuthenticated) {
-      navigate('/login');
-    } else if (!requireAuth && isAuthenticated) {
-      navigate('/');
+    const shouldRedirect = requireAuth ? !isAuthenticated : isAuthenticated;
+    const redirectPath = requireAuth ? '/login' : '/';
+
+    if (shouldRedirect) {
+      navigate(redirectPath);
     }
   }, [isAuthenticated, requireAuth, navigate]);
 
-  if ((requireAuth && !isAuthenticated) || (!requireAuth && isAuthenticated)) {
+  const shouldRender = requireAuth ? isAuthenticated : !isAuthenticated;
+
+  if (!shouldRender) {
     return null;
   }
 
-  return <>{children}</>;
+  return children;
 }
 

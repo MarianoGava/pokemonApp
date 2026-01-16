@@ -3,7 +3,8 @@ import { usePokemon } from '@/lib/queries';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import BaseStats from '@/components/BaseStats';
 import AboutSection from '@/components/AboutSection';
-import { typeColors } from '@/constants/typeColors';
+import { getTypeColorClass, getTypeColorHex } from '@/utils/typeColors';
+import { UI_CONFIG } from '@/constants/config';
 import backArrow from '@/assets/icons/back-arrow.svg';
 import pokeballIcon from '@/assets/icons/pokeball.svg';
 
@@ -15,13 +16,13 @@ interface HeaderProps {
 
 function Header({ pokemonName, pokemonNumber, primaryColorClass }: HeaderProps) {
   return (
-    <header className={`${primaryColorClass} text-gray-white shadow-drop relative overflow-hidden h-[220px] flex-shrink-0`}>
+    <header className={`${primaryColorClass} text-gray-white relative overflow-hidden h-[220px] flex-shrink-0`}>
         <img 
           src={pokeballIcon} 
           alt="Pokeball background" 
           className="absolute right-2 top-2 w-auto brightness-0 invert opacity-10 h-[200px]"
         />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center relative z-10">
+      <div className="px-4 sm:px-6 py-4 flex justify-between items-center relative z-10">
         <div className="flex items-center">
           <Link
             to="/"
@@ -43,36 +44,6 @@ export default function PokemonDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { data: pokemon, isLoading, error } = usePokemon(id!);
 
-  const getTypeColorClass = (type: string) => {
-    const typeLower = type.toLowerCase();
-    const colorMap: Record<string, string> = {
-      normal: 'bg-type-normal',
-      fire: 'bg-type-fire',
-      water: 'bg-type-water',
-      electric: 'bg-type-electric',
-      grass: 'bg-type-grass',
-      ice: 'bg-type-ice',
-      fighting: 'bg-type-fighting',
-      poison: 'bg-type-poison',
-      ground: 'bg-type-ground',
-      flying: 'bg-type-flying',
-      psychic: 'bg-type-psychic',
-      bug: 'bg-type-bug',
-      rock: 'bg-type-rock',
-      ghost: 'bg-type-ghost',
-      dragon: 'bg-type-dragon',
-      dark: 'bg-type-dark',
-      steel: 'bg-type-steel',
-      fairy: 'bg-type-fairy',
-    };
-    return colorMap[typeLower] || 'bg-type-normal';
-  };
-
-  const getTypeColorHex = (type: string): string => {
-    const typeLower = type.toLowerCase() as keyof typeof typeColors;
-    return typeColors[typeLower] || typeColors.normal;
-  };
-
   const getPrimaryTypeColorClass = () => {
     if (!pokemon?.types?.length) return 'bg-primary';
     return getTypeColorClass(pokemon.types[0]);
@@ -89,13 +60,14 @@ export default function PokemonDetailPage() {
   return (
     <ProtectedRoute>
       <div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: primaryColorHex }}>
-        <Header
-          pokemonName={pokemon?.name}
-          pokemonNumber={pokemon?.number}
-          primaryColorClass={primaryColorClass}
-        />
+        <div className="mx-auto w-full flex flex-col flex-1" style={{ maxWidth: UI_CONFIG.MAX_CONTENT_WIDTH }}>
+          <Header
+            pokemonName={pokemon?.name}
+            pokemonNumber={pokemon?.number}
+            primaryColorClass={primaryColorClass}
+          />
 
-        <div className="relative mx-1 mb-1 flex-1 flex flex-col min-h-0">
+          <div className="relative mx-1 mb-1 flex-1 flex flex-col min-h-0">
             {isLoading ? (
               <div className="text-center py-12">
                 <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: primaryColorHex }}></div>
@@ -114,9 +86,9 @@ export default function PokemonDetailPage() {
                     className="w-full h-full object-contain"
                   />
                 </div>
-              <div className="bg-gray-white rounded-lg shadow-drop flex flex-col min-h-0">
-                    <div className="text-center md:text-left flex-shrink-0">
-                      <div className="flex flex-wrap mt-20 gap-2 justify-center md:justify-start">
+                <div className="bg-gray-white rounded-lg shadow-drop flex flex-col flex-1 min-h-0 overflow-y-auto">
+                    <div className="text-center flex-shrink-0">
+                      <div className="flex flex-wrap mt-20 gap-2 justify-center">
                         {pokemon.types.map((type) => (
                           <span
                             key={type}
@@ -129,16 +101,17 @@ export default function PokemonDetailPage() {
                       </div>
                     </div>
 
-                    <div className="p-6 overflow-y-auto flex-1">
+                    <div className="p-6 space-y-6">
                       <AboutSection
                         pokemon={pokemon}
                         primaryColorHex={primaryColorHex}
                       />
                       <BaseStats stats={pokemon.stats} primaryColorHex={primaryColorHex} />
                     </div>
-              </div>
+                </div>
               </>
             ) : null}
+          </div>
         </div>
       </div>
     </ProtectedRoute>

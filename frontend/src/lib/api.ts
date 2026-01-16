@@ -67,29 +67,13 @@ export interface PokemonDetail {
   image_url: string;
   height: number;
   weight: number;
-  base_experience: number;
   types: string[];
   abilities: Array<{
     name: string;
-    is_hidden: boolean;
-    slot: number;
-  }>;
-  moves: Array<{
-    name: string;
-    version_group_details: Array<{
-      level_learned_at: number;
-      move_learn_method: string;
-      version_group: string;
-    }>;
-  }>;
-  forms: Array<{
-    name: string;
-    url: string;
   }>;
   stats: Array<{
     name: string;
     base_stat: number;
-    effort: number;
   }>;
 }
 

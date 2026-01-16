@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { PokemonListItem } from '@/lib/api';
 
@@ -5,11 +6,11 @@ interface PokemonCardProps {
   pokemon: PokemonListItem;
 }
 
-export default function PokemonCard({ pokemon }: PokemonCardProps) {
+function PokemonCard({ pokemon }: PokemonCardProps) {
   return (
     <Link
       to={`/pokemon/${pokemon.id}`}
-      className="bg-gray-white h-[108px] w-full rounded-lg shadow-card cursor-pointer flex flex-col justify-between relative"
+      className="bg-gray-white h-[108px] w-full rounded-lg shadow-card flex flex-col justify-between relative"
     >
       <p className="font-poppins text-gray-medium text-caption text-right mt-2 mr-2">
         #{String(pokemon.number).padStart(3, '0')}
@@ -32,3 +33,5 @@ export default function PokemonCard({ pokemon }: PokemonCardProps) {
     </Link>
   );
 }
+
+export default memo(PokemonCard);

@@ -4,11 +4,16 @@ module Api
       before_action :authenticate_user
 
       def index
+        offset = [params[:offset]&.to_i || 0, 0].max
+        limit = [[params[:limit]&.to_i || 20, 1].max, 100].min
+        search = params[:search]&.strip.presence
+        sort_by = params[:sort_by]&.strip.presence
+
         result = PokeapiService.get_pokemons(
-          offset: params[:offset]&.to_i || 0,
-          limit: params[:limit]&.to_i || 20,
-          search: params[:search]&.strip,
-          sort_by: params[:sort_by]&.strip
+          offset: offset,
+          limit: limit,
+          search: search,
+          sort_by: sort_by
         )
         
         if result[:error]

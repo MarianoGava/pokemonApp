@@ -6,7 +6,7 @@ import sortNumberIcon from '@/assets/icons/sort-number.svg';
 import sortNameIcon from '@/assets/icons/sort-name.svg';
 import SortModal from './SortModal';
 
-export type SortOption = 'name' | 'number' | 'default';
+export type SortOption = 'name' | 'number';
 
 interface ListHeaderProps {
   searchInput: string;
@@ -31,8 +31,8 @@ export default function ListHeader({
 
   return (
     <>
-      <header className="sticky top-0 z-30 bg-primary text-gray-white shadow-drop">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="sticky top-0 z-30 bg-primary text-gray-white">
+        <div className="px-4 sm:px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <img 
@@ -94,7 +94,6 @@ export default function ListHeader({
           </div>
         </div>
       </header>
-
       <SortModal
         isOpen={isSortModalOpen}
         sortBy={sortBy}

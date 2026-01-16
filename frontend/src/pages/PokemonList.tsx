@@ -3,17 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { usePokemons, useLogout } from '@/lib/queries';
 import { authStorage } from '@/lib/auth';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import PokemonCard from '@/components/pokemonCard';
+import PokemonCard from '@/components/PokemonCard';
 import ListHeader, { SortOption } from '@/components/ListHeader';
 import { useDebounce } from '@/hooks/useDebounce';
+import { API_CONFIG, UI_CONFIG } from '@/constants/config';
 
 export default function ListPage() {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
-  const searchQuery = useDebounce(searchInput, 500);
+  const searchQuery = useDebounce(searchInput, API_CONFIG.DEBOUNCE_DELAY);
   const [sortBy, setSortBy] = useState<SortOption>('number');
-  const [offset, setOffset] = useState(0);
-  const limit = 20;
+  const [offset, setOffset] = useState<number>(API_CONFIG.DEFAULT_OFFSET);
+  const limit = API_CONFIG.DEFAULT_LIMIT;
 
   useEffect(() => {
     setOffset(0);
@@ -34,8 +35,8 @@ export default function ListPage() {
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
-    } catch (err) {
-      console.error('Logout error:', err);
+    } catch {
+      // Error is handled by the mutation, just proceed with logout
     }
     authStorage.clear();
     navigate('/login');
@@ -45,18 +46,19 @@ export default function ListPage() {
   return (
     <ProtectedRoute>
       <div className="h-screen flex flex-col bg-primary border-4 border-primary overflow-hidden">
-        <ListHeader
-          searchInput={searchInput}
-          onSearchChange={setSearchInput}
-          onSearchClear={() => setSearchInput('')}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          onLogout={handleLogout}
-          isLoggingOut={logoutMutation.isPending}
-        />
+        <div className="mx-auto w-full flex flex-col flex-1 min-h-0" style={{ maxWidth: UI_CONFIG.MAX_CONTENT_WIDTH }}>
+          <ListHeader
+            searchInput={searchInput}
+            onSearchChange={setSearchInput}
+            onSearchClear={() => setSearchInput('')}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            onLogout={handleLogout}
+            isLoggingOut={logoutMutation.isPending}
+          />
 
-        <main className="flex-1 overflow-y-auto  bg-gray-white rounded-lg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <main className="flex-1 overflow-y-auto bg-gray-white rounded-lg">
+            <div className="px-4 sm:px-6 py-8">
             {error && (
               <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-body2">
                 {error}
@@ -71,13 +73,13 @@ export default function ListPage() {
             ) : (
               <>
                 {pokemons.length > 0 ? (
-                  <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-3 gap-2">
                     {pokemons.map((pokemon) => (
                       <PokemonCard key={pokemon.id} pokemon={pokemon} />
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-12 bg-gray-white rounded-lg">
+                  <div className="text-center py-12">
                     <p className="text-body1 text-gray-medium">No pokemons found</p>
                   </div>
                 )}
@@ -105,8 +107,9 @@ export default function ListPage() {
                 )}
               </>
             )}
-          </div>
-        </main>
+            </div>
+          </main>
+        </div>
       </div>
     </ProtectedRoute>
   );

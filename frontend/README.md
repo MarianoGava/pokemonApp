@@ -1,6 +1,6 @@
 # Pokemon App Frontend
 
-React SPA application with TypeScript, React Router, and Tailwind CSS.
+React SPA application with TypeScript, React Router, and Tailwind CSS. Features server-side filtering, sorting, and pagination with optimized performance.
 
 ## Setup
 
@@ -9,19 +9,19 @@ React SPA application with TypeScript, React Router, and Tailwind CSS.
 npm install
 ```
 
-2. Create `.env` file (optional, uses defaults if not present):
+2. Create `.env` file:
 ```bash
-cp .env.example .env
-```
-
-Or create it manually:
-```env
+# Required
 VITE_API_URL=http://localhost:3001/api/v1
+
+# Optional (defaults to 'pokemon_app_auth')
+VITE_AUTH_KEY=pokemon_app_auth
 ```
 
 ## Environment Variables
 
-- `VITE_API_URL` - Backend API base URL (default: `http://localhost:3001/api/v1`)
+- `VITE_API_URL` (required) - Backend API base URL
+- `VITE_AUTH_KEY` (optional) - LocalStorage key for auth data (default: `pokemon_app_auth`)
 
 3. Start development server:
 ```bash
@@ -52,16 +52,30 @@ The built files will be in the `dist` directory.
 
 ```
 src/
+├── assets/
+│   └── icons/                # SVG icons (pokeball, search, sort, etc.)
 ├── components/
-│   └── ProtectedRoute.tsx    # Route protection component
+│   ├── AboutSection.tsx      # Pokemon about section
+│   ├── BaseStats.tsx         # Base stats with progress bars
+│   ├── ListHeader.tsx        # List page header with search/sort
+│   ├── PokemonCard.tsx       # Pokemon card component
+│   ├── ProtectedRoute.tsx    # Route protection
+│   └── SortModal.tsx         # Sort options modal
+├── constants/
+│   ├── config.ts             # App configuration (API config, UI config)
+│   └── typeColors.ts         # Pokemon type color definitions
+├── hooks/
+│   └── useDebounce.ts        # Debounce hook for search input
 ├── lib/
-│   ├── api.ts                # API functions and TypeScript interfaces
-│   ├── queries.ts            # React Query hooks and query keys
-│   └── auth.ts               # Authentication utilities
+│   ├── api.ts                # API client and TypeScript interfaces
+│   ├── auth.ts               # Authentication utilities
+│   └── queries.ts            # React Query hooks and query keys
 ├── pages/
 │   ├── LoginPage.tsx         # Login page
-│   ├── ListPage.tsx          # Main Pokemon list page
+│   ├── PokemonList.tsx       # Main Pokemon list page
 │   └── PokemonDetailPage.tsx # Pokemon detail page
+├── utils/
+│   └── typeColors.ts         # Type color utility functions
 ├── App.tsx                   # Main app component with routes
 ├── main.tsx                  # Entry point
 └── index.css                 # Global styles
@@ -69,10 +83,23 @@ src/
 
 ## Features
 
-- Login page with validation
-- Protected routes (redirects if not authenticated)
-- Pokemon list with search and sorting
-- Pagination
-- Pokemon detail view with abilities, moves, and forms
-- Responsive design
-- Loading states and error handling
+- **Authentication**: Login page with form validation, protected routes, automatic redirect on session expiration
+- **Pokemon List**: 
+  - Debounced search (500ms) by name or ID
+  - Server-side filtering and sorting
+  - Pagination with Previous/Next controls
+  - Fixed header with scrollable content
+- **Pokemon Detail**: 
+  - Dynamic color theming based on Pokemon type
+  - Base stats with visual progress bars
+  - About section (height, weight, abilities)
+  - Scrollable content with fixed header and image
+- **Performance**: 
+  - React.memo for component optimization
+  - React Query for smart caching
+  - Lazy-loaded images
+- **Design**: 
+  - Mobile-first responsive design
+  - Max-width container (780px) on desktop
+  - Custom design system (colors, typography, shadows)
+  - Loading states and comprehensive error handling

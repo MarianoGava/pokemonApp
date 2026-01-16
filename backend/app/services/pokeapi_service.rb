@@ -115,33 +115,12 @@ class PokeapiService
       image_url: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/#{data['id']}.png",
       height: data['height'],
       weight: data['weight'],
-      base_experience: data['base_experience'],
       types: data['types'].map { |t| t['type']['name'] },
-      abilities: data['abilities'].map do |a|
-        {
-          name: a['ability']['name'],
-          is_hidden: a['is_hidden'],
-          slot: a['slot']
-        }
-      end,
-      moves: data['moves'].map do |m|
-        {
-          name: m['move']['name'],
-          version_group_details: m['version_group_details'].map do |vgd|
-            {
-              level_learned_at: vgd['level_learned_at'],
-              move_learn_method: vgd['move_learn_method']['name'],
-              version_group: vgd['version_group']['name']
-            }
-          end
-        }
-      end,
-      forms: data['forms'].map { |f| { name: f['name'], url: f['url'] } },
+      abilities: data['abilities'].map { |a| { name: a['ability']['name'] } },
       stats: data['stats'].map do |s|
         {
           name: s['stat']['name'],
-          base_stat: s['base_stat'],
-          effort: s['effort']
+          base_stat: s['base_stat']
         }
       end
     }

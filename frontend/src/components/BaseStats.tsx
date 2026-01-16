@@ -1,3 +1,6 @@
+import { memo } from 'react';
+import { API_CONFIG } from '@/constants/config';
+
 interface Stat {
   name: string;
   base_stat: number;
@@ -20,7 +23,7 @@ const getStatAbbreviation = (statName: string): string => {
   return statMap[statName.toLowerCase()] || statName.toUpperCase();
 };
 
-export default function BaseStats({ stats, primaryColorHex }: BaseStatsProps) {
+function BaseStats({ stats, primaryColorHex }: BaseStatsProps) {
   return (
     <section>
       <h3 className="text-subtitle1 mb-4 text-center" style={{ color: primaryColorHex }}>Base Stats</h3>
@@ -48,7 +51,7 @@ export default function BaseStats({ stats, primaryColorHex }: BaseStatsProps) {
                 <div
                   className="h-1 rounded-full relative z-10"
                   style={{ 
-                    width: `${(stat.base_stat / 255) * 100}%`,
+                    width: `${(stat.base_stat / API_CONFIG.MAX_STAT_VALUE) * 100}%`,
                     backgroundColor: primaryColorHex
                   }}
                 ></div>
@@ -60,3 +63,5 @@ export default function BaseStats({ stats, primaryColorHex }: BaseStatsProps) {
     </section>
   );
 }
+
+export default memo(BaseStats);
