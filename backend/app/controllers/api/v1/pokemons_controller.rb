@@ -38,6 +38,7 @@ module Api
       def authenticate_user
         unless session[:user_id]
           render json: { error: 'Unauthorized' }, status: :unauthorized
+          return
         end
       end
     end

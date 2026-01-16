@@ -8,7 +8,7 @@ class ApplicationController < ActionController::API
   private
   
   def set_session_store
-    request.session_options[:expire_after] = 1.hours
+    request.session_options[:expire_after] = 1.hour
   end
 end
 

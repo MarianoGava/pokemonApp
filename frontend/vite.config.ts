@@ -19,5 +19,9 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    // Vite automatically excludes files not imported from entry point
+    // Test files are already excluded by TypeScript config and Vite's tree-shaking
+  },
 })
 

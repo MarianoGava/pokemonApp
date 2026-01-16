@@ -49,6 +49,30 @@ rails server -p 3001
   - Query params: `offset` (min: 0), `limit` (1-100), `search`, `sort_by` (name|id)
 - `GET /api/v1/pokemons/:id` - Get Pokemon details (uses REST API)
 
+## Testing
+
+Run tests with RSpec:
+
+```bash
+# Run all tests
+bundle exec rspec
+
+# Run specific test file
+bundle exec rspec spec/services/pokeapi_service_spec.rb
+bundle exec rspec spec/requests/api/v1/auth_spec.rb
+
+# Run with documentation format (shows test descriptions)
+bundle exec rspec --format documentation
+
+# Run specific test by line number
+bundle exec rspec spec/services/pokeapi_service_spec.rb:45
+
+# Run tests matching a pattern
+bundle exec rspec --pattern "spec/services/*_spec.rb"
+```
+
+See `spec/README.md` for detailed test documentation.
+
 ## Notes
 
 - **No database required** - uses PokeAPI as source of truth
@@ -58,4 +82,5 @@ rails server -p 3001
 - **Parameter validation** on all endpoints (offset, limit ranges)
 - **Optimized responses** - only returns fields used by frontend
 - **CORS enabled** for frontend communication
+- **Tests use WebMock** - all HTTP requests are mocked, no internet required
 

@@ -39,6 +39,25 @@ npm run build
 
 The built files will be in the `dist` directory.
 
+## Testing
+
+Run tests with Vitest:
+```bash
+# Run tests in watch mode
+npm test
+
+# Run tests once
+npm run test:run
+
+# Run tests with coverage
+npm run test:coverage
+
+# Run tests with UI
+npm run test:ui
+```
+
+Coverage reports will be generated in the `coverage` directory.
+
 ## Tech Stack
 
 - **React 18.3** - UI library
@@ -47,6 +66,8 @@ The built files will be in the `dist` directory.
 - **React Router 6** - Client-side routing
 - **Tailwind CSS** - Styling
 - **TanStack React Query** - Data fetching, caching, and synchronization
+- **Vitest** - Test runner
+- **React Testing Library** - Component testing utilities
 
 ## Project Structure
 
@@ -74,6 +95,10 @@ src/
 │   ├── LoginPage.tsx         # Login page
 │   ├── PokemonList.tsx       # Main Pokemon list page
 │   └── PokemonDetailPage.tsx # Pokemon detail page
+├── test/
+│   ├── setup.ts              # Test setup and mocks
+│   ├── testUtils.tsx         # Testing utilities (renderWithProviders)
+│   └── mockData.ts           # Mock data for tests
 ├── utils/
 │   └── typeColors.ts         # Type color utility functions
 ├── App.tsx                   # Main app component with routes
@@ -103,3 +128,13 @@ src/
   - Max-width container (780px) on desktop
   - Custom design system (colors, typography, shadows)
   - Loading states and comprehensive error handling
+
+## Test Coverage
+
+Tests are organized by feature:
+- **Components**: Tests for all reusable components (`PokemonCard`, `AboutSection`, `BaseStats`, `ProtectedRoute`, `SortModal`)
+- **Hooks**: Tests for custom hooks (`useDebounce`)
+- **Utils**: Tests for utility functions (`typeColors`)
+- **Lib**: Tests for core library functions (`auth`)
+
+Run `npm run test:coverage` to see coverage reports.
